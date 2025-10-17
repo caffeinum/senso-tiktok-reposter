@@ -35,6 +35,9 @@ python cli_repurpose.py --profile tiktok
 
 # 3) URL ingestion (raw web pages -> Senso)
 uv run --with requests --with beautifulsoup4 --env-file .env python ingest_urls.py https://docs.senso.ai/introduction
+
+# 4) Inspect stored content as JSON
+uv run --with requests --env-file .env python read_senso.py --content-id <id> --json
 ```
 
 Each script streams progress, polls until Senso has indexed the content, and prints prettified results in your terminal.

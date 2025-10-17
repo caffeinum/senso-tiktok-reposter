@@ -11,6 +11,7 @@ USAGE
 """
 
 import argparse
+import json
 import os
 import sys
 import time
@@ -53,6 +54,7 @@ def run_apify_actor(
 
 def items_to_markdown(descriptor: str, items: List[Dict[str, Any]]) -> str:
     lines: List[str] = [f"# TikTok dataset for {descriptor}", ""]
+    structured: List[Dict[str, Any]] = []
 
     for idx, item in enumerate(items, start=1):
         author = item.get("authorMeta", {}) or {}
@@ -67,12 +69,20 @@ def items_to_markdown(descriptor: str, items: List[Dict[str, Any]]) -> str:
         }
         stat_text = ", ".join(f"{name}={value}" for name, value in stats.items() if isinstance(value, int))
         video_url = item.get("webVideoUrl") or author.get("profileUrl") or "n/a"
+        video_meta = item.get("videoMeta") or {}
+        download_url = video_meta.get("downloadAddr")
+        media_urls = item.get("mediaUrls") or []
         published = item.get("createTimeISO") or str(item.get("createTime") or "unknown")
 
         lines.append(f"## Video {idx} — {item.get('id', 'unknown')}")
         lines.append(f"- Author: {author_name} (@{handle})" if handle else f"- Author: {author_name}")
         lines.append(f"- Published: {published}")
-        lines.append(f"- URL: {video_url}")
+        lines.append(f"- TikTok URL: {video_url}")
+        if download_url:
+            lines.append(f"- Download URL: {download_url}")
+        for media in media_urls:
+            if media:
+                lines.append(f"- Media URL: {media}")
         if stat_text:
             lines.append(f"- Stats: {stat_text}")
         hashtags = ", ".join(f"#{h.get('name')}" for h in item.get("hashtags", []) if h.get("name"))
@@ -80,6 +90,27 @@ def items_to_markdown(descriptor: str, items: List[Dict[str, Any]]) -> str:
             lines.append(f"- Hashtags: {hashtags}")
         lines.append("")
         lines.append(caption)
+        lines.append("")
+
+        structured.append(
+            {
+                "videoMeta.coverUrl": video_meta.get("coverUrl"),
+                "videoMeta.duration": video_meta.get("duration"),
+                "videoMeta.definition": video_meta.get("definition"),
+                "videoMeta.format": video_meta.get("format"),
+                "videoMeta.height": video_meta.get("height"),
+                "videoMeta.width": video_meta.get("width"),
+                "videoMeta.downloadAddr": download_url,
+                "mediaUrls": media_urls,
+                "text": caption,
+            }
+        )
+
+    if structured:
+        lines.append("### Structured Payload")
+        lines.append("```json")
+        lines.append(json.dumps(structured, indent=2))
+        lines.append("```")
         lines.append("")
 
     return "\n".join(lines).strip()
