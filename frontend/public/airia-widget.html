@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Airia Embed</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module">
+      import AiriaChat from "https://chat.airia.ai/api/get-chat-embed";
+
+      AiriaChat.init({
+        pipelineId: "add4efac-37f8-4a82-bad7-cc94c1a8055b",
+        apiKey:
+          "ak-MTMzMTAzODQzMnwxNzYwNzM5NTY3Mzc0fHRpLVdXOXNiMk52WkdVdFQzQmxiaUJTWldkcGMzUnlZWFJwYjI0dFVISnZabVZ6YzJsdmJtRnN8MXwxMTE2NDgyODUg",
+        apiUrl: "https://embed-api.airia.ai",
+        greeting: "input video caption an i will create twitter version",
+        imagePath: "https://yoursite.com/assets/chatbot-icon.png",
+        imageSize: "small",
+        imageBgColor: "#FFFFFF",
+        autoOpen: true,
+      });
+    </script>
+  </body>
+</html>
