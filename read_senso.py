@@ -6,6 +6,7 @@ Usage examples:
   export SENSO_KEY="sk_prod_xxx"
   python read_senso.py --content-id d4b0471a-03e3-48f4-88f5-cfcbeca48806
   python read_senso.py --search "What is the Senso SDK?"
+  python read_senso.py --content-id d4b0471a-03e3-48f4-88f5-cfcbeca48806 --json
 """
 
 from __future__ import annotations
@@ -14,6 +15,8 @@ import argparse
 import os
 import sys
 from typing import Any, Dict, List
+
+import json
 
 import requests
 
@@ -81,6 +84,7 @@ def main() -> None:
     parser.add_argument("--content-id", help="Fetch a specific content object by ID.")
     parser.add_argument("--search", help="Run a semantic search query.")
     parser.add_argument("--max-results", type=int, default=3, help="Limit search hits.")
+    parser.add_argument("--json", action="store_true", help="Output full JSON payload.")
     args = parser.parse_args()
 
     if not args.content_id and not args.search:
@@ -91,20 +95,26 @@ def main() -> None:
 
     if args.content_id:
         data = fetch_content(args.content_id, senso_key)
-        print(summarize_content(data))
-        text = data.get("text")
-        if text:
-            print("--- Text (first 800 chars) ---")
-            preview = text[:800].rstrip()
-            print(preview + ("…" if len(text) > 800 else ""))
+        if args.json:
+            print(json.dumps(data, indent=2))
+        else:
+            print(summarize_content(data))
+            text = data.get("text")
+            if text:
+                print("--- Text (first 800 chars) ---")
+                preview = text[:800].rstrip()
+                print(preview + ("…" if len(text) > 800 else ""))
 
     if args.search:
         payload = search(args.search, senso_key, args.max_results)
-        print("\n=== Search Answer ===")
-        answer = payload.get("answer") or "<no answer>"
-        print(answer.strip())
-        print("\n=== Top Results ===")
-        print(render_search_results(payload.get("results", [])))
+        if args.json:
+            print(json.dumps(payload, indent=2))
+        else:
+            print("\n=== Search Answer ===")
+            answer = payload.get("answer") or "<no answer>"
+            print(answer.strip())
+            print("\n=== Top Results ===")
+            print(render_search_results(payload.get("results", [])))
 
 
 if __name__ == "__main__":
