@@ -66,38 +66,42 @@ export default function TikTokResultsPage() {
             </div>
           </header>
 
-          <main className="mx-auto flex w-full max-w-3xl flex-col items-center gap-8 px-6 pb-24 pt-12">
-            <div className="space-y-3 text-center">
-              <h1 className="text-4xl font-normal leading-tight text-[#595959] sm:text-5xl">
-                your tiktok is ready!
-              </h1>
-              <p className="text-base text-[#595959]">
-                download and share with your audience
-              </p>
+          <main className="mx-auto flex w-full max-w-6xl gap-12 px-6 pb-24 pt-12">
+            <div className="flex w-1/2 items-center justify-center">
+              <video
+                src="/output.mp4"
+                controls
+                autoPlay
+                loop
+                playsInline
+                className="h-auto w-full max-w-[360px] rounded-2xl border border-[#d0d0d0] bg-black shadow-2xl"
+              />
             </div>
 
-            <video
-              src="/output.mp4"
-              controls
-              autoPlay
-              loop
-              playsInline
-              className="h-auto w-full max-w-[360px] rounded-2xl border border-[#d0d0d0] bg-black shadow-2xl"
-            />
+            <div className="flex w-1/2 flex-col justify-center gap-8">
+              <div className="space-y-3">
+                <h1 className="text-4xl font-normal leading-tight text-[#595959] sm:text-5xl">
+                  your branded content is ready!
+                </h1>
+                <p className="text-base text-[#595959]">
+                  download and share with your audience
+                </p>
+              </div>
 
-            <div className="flex gap-4">
-              <button className="rounded-full bg-[#32e979] px-8 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-[#22e58b]">
-                download video
-              </button>
-              <button
-                onClick={() => {
-                  setShowResult(false);
-                  setSelectedVideo(null);
-                }}
-                className="rounded-full border border-[#d0d0d0] bg-white px-8 py-3 text-sm font-semibold text-[#595959] transition hover:bg-[#f5f5f5]"
-              >
-                create another
-              </button>
+              <div className="flex gap-4">
+                <button className="rounded-full bg-[#32e979] px-8 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-[#22e58b]">
+                  download video
+                </button>
+                <button
+                  onClick={() => {
+                    setShowResult(false);
+                    setSelectedVideo(null);
+                  }}
+                  className="rounded-full border border-[#d0d0d0] bg-white px-8 py-3 text-sm font-semibold text-[#595959] transition hover:bg-[#f5f5f5]"
+                >
+                  create another
+                </button>
+              </div>
             </div>
           </main>
         </div>
