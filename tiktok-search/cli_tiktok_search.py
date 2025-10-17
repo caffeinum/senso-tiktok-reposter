@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-CLI Support Hub
+TikTok Search CLI
 Fetch TikTok data via Apify → ingest it as **raw** content in Senso →
 wait until it is searchable → open an interactive Q&A prompt.
 
 USAGE
   export SENSO_KEY="sk_prod_xxx"
   export APIFY_TOKEN="apify_api_xxx"
-  python cli_support_hub.py --profiles tiktok --hashtags openai --search-queries "ai trends"
+  python cli_tiktok_search.py --profiles tiktok --hashtags openai --search-queries "ai trends"
 """
 
 import argparse

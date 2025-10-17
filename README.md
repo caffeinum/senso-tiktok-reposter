@@ -4,8 +4,8 @@ Two tiny scripts that show what you can build with the Senso API in under 200 LO
 
 | Demo | What it does | Key Senso endpoints |
 |------|--------------|---------------------|
-| **`cli_support_hub.py`** | Pull TikTok data through Apify, ingest it as **raw** content, then open an interactive terminal search. | `/content/raw` &nbsp; `/content/{id}` &nbsp; `/search` |
-| **`cli_repurpose.py`** | Fetch TikTok clips, ingest them, then autogenerate a tweet-thread, LinkedIn post, and email teaser (all saved). | `/content/raw` &nbsp; `/content/{id}` &nbsp; `/generate` |
+| **`tiktok-search/cli_tiktok_search.py`** | Pull TikTok data through Apify, ingest it as **raw** content, then open an interactive terminal search. | `/content/raw` &nbsp; `/content/{id}` &nbsp; `/search` |
+| **`tiktok-repurpose/cli_tiktok_repurpose.py`** | Fetch TikTok clips, ingest them, then autogenerate a tweet-thread, LinkedIn post, and email teaser (all saved). | `/content/raw` &nbsp; `/content/{id}` &nbsp; `/generate` |
 | **`ingest_urls.py`** | Fetch arbitrary web pages, convert to markdown, and ingest them as **raw** content. | `/content/raw` &nbsp; `/content/{id}` |
 
 Apify handles the TikTok scraping (downloading videos and metadata); Senso handles indexing, search, and generation.
@@ -23,15 +23,15 @@ export SENSO_KEY="sk_prod_xxx"
 export APIFY_TOKEN="apify_api_xxx"
 
 # deps
-pip install -r requirements.txt        # requests, rich
+pip install -r requirements.txt        # requests, rich, beautifulsoup4
 
-# 1) Support hub search (TikTok profiles, hashtags, search queries)
+# 1) TikTok search (profiles, hashtags, search queries)
 #    omit the flags to enter values interactively
-python cli_support_hub.py --profiles tiktok
+python tiktok-search/cli_tiktok_search.py --profiles tiktok
 
-# 2) Content repurposer (TikTok -> marketing assets)
+# 2) TikTok repurposer (TikTok -> marketing assets)
 #    omit the flags to choose a source interactively
-python cli_repurpose.py --profile tiktok
+python tiktok-repurpose/cli_tiktok_repurpose.py --profile tiktok
 
 # 3) URL ingestion (raw web pages -> Senso)
 uv run --with requests --with beautifulsoup4 --env-file .env python ingest_urls.py https://docs.senso.ai/introduction

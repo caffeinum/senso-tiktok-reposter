@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-CLI Content Repurposer
+TikTok Repurposer CLI
 Scrape TikTok videos via Apify → ingest as **raw** content in Senso →
 generate a tweet thread, LinkedIn blurb, and email teaser (all saved).
 
 USAGE
   export SENSO_KEY="sk_prod_xxx"
   export APIFY_TOKEN="apify_api_xxx"
-  python cli_repurpose.py --profile tiktok
+  python cli_tiktok_repurpose.py --profile tiktok
 """
 
 import argparse
