@@ -268,6 +268,7 @@ export default function TikTokResultsPage() {
               >
                 <video
                   src={videoUrl}
+                  autoPlay
                   loop
                   muted
                   playsInline
