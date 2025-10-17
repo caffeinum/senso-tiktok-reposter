@@ -8,8 +8,10 @@ export default function TikTokResultsPage() {
   const queryParam = router.query.query;
   const keyword = Array.isArray(queryParam) ? queryParam[0] : queryParam;
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+  const [showUploadStep, setShowUploadStep] = useState(false);
   const [showProcessing, setShowProcessing] = useState(false);
   const [showResult, setShowResult] = useState(false);
+  const [brandCopy, setBrandCopy] = useState("When you're trying to build something big without Apify");
 
   const videos = [
     "https://api.apify.com/v2/key-value-stores/fPv7REDpL3IxnkKLr/records/video-jixiewang-20220520043751-7099673155060452654.mp4",
@@ -21,14 +23,18 @@ export default function TikTokResultsPage() {
     setSelectedVideo(videoUrl);
   };
 
-  const handleGenerate = () => {
+  const handleContinueToUpload = () => {
     if (selectedVideo) {
-      setShowProcessing(true);
-      setTimeout(() => {
-        setShowProcessing(false);
-        setShowResult(true);
-      }, 3000);
+      setShowUploadStep(true);
     }
+  };
+
+  const handleGenerate = () => {
+    setShowProcessing(true);
+    setTimeout(() => {
+      setShowProcessing(false);
+      setShowResult(true);
+    }, 3000);
   };
 
   if (showResult) {
@@ -36,17 +42,20 @@ export default function TikTokResultsPage() {
       <>
         <Head>
           <title>Super Content - Generated Video</title>
+          <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet" />
         </Head>
         <div className="min-h-screen bg-[#f9f9f9] text-[#595959]">
           <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-6">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <div className="relative">
                 <div className="absolute -inset-3 rounded-full bg-[#32e979]/30 blur-xl" />
-                <div className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#32e979] to-[#22e58b] shadow-lg">
-                  <div className="flex h-0 w-0 border-y-[8px] border-l-[14px] border-y-transparent border-l-white" style={{ marginLeft: '3px' }} />
+                <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#32e979] to-[#22e58b] shadow-lg">
+                  <svg width="22" height="23" viewBox="0 0 21.646 22.637" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M 18.877 9.871 C 20.046 10.482 20.046 12.155 18.877 12.766 L 2.391 21.387 C 1.303 21.955 0 21.166 0 19.939 L 0 2.698 C 0 1.47 1.303 0.681 2.391 1.25 Z" fill="white" filter="drop-shadow(0px 2.72px 1px rgba(196, 196, 196, 1))"/>
+                  </svg>
                 </div>
               </div>
-              <span className="font-['Bangers'] text-2xl italic text-[#212121]">SUPER CONTENT</span>
+              <span style={{ fontFamily: 'Bangers, sans-serif' }} className="text-2xl italic text-[#212121]">SUPER CONTENT</span>
             </div>
           </header>
 
@@ -89,22 +98,88 @@ export default function TikTokResultsPage() {
     );
   }
 
+  if (showUploadStep) {
+    return (
+      <>
+        <Head>
+          <title>Super Content - Upload Logo</title>
+          <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet" />
+        </Head>
+        <div className="min-h-screen bg-[#f9f9f9] text-[#595959]">
+          <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-6">
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <div className="absolute -inset-3 rounded-full bg-[#32e979]/30 blur-xl" />
+                <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#32e979] to-[#22e58b] shadow-lg">
+                  <svg width="22" height="23" viewBox="0 0 21.646 22.637" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M 18.877 9.871 C 20.046 10.482 20.046 12.155 18.877 12.766 L 2.391 21.387 C 1.303 21.955 0 21.166 0 19.939 L 0 2.698 C 0 1.47 1.303 0.681 2.391 1.25 Z" fill="white" filter="drop-shadow(0px 2.72px 1px rgba(196, 196, 196, 1))"/>
+                  </svg>
+                </div>
+              </div>
+              <span style={{ fontFamily: 'Bangers, sans-serif' }} className="text-2xl italic text-[#212121]">SUPER CONTENT</span>
+            </div>
+          </header>
+
+          <main className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-6 pb-24 pt-12">
+            <div className="space-y-3">
+              <h1 className="text-4xl font-normal leading-tight text-[#595959] sm:text-5xl">
+                upload your logo
+              </h1>
+              <p className="max-w-2xl text-base text-[#595959]">
+                add your brand logo and customize the video copy
+              </p>
+            </div>
+
+            <div className="space-y-6 rounded-3xl border border-[#d0d0d0] bg-white p-8">
+              <div className="space-y-3">
+                <label className="text-sm font-semibold text-[#212121]">brand logo</label>
+                <div className="flex items-center justify-center rounded-2xl border-2 border-dashed border-[#d0d0d0] bg-[#f9f9f9] p-12">
+                  <img src="/apify_sdk.svg" alt="Apify logo" className="h-16" />
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-sm font-semibold text-[#212121]">video copy</label>
+                <textarea
+                  value={brandCopy}
+                  onChange={(e) => setBrandCopy(e.target.value)}
+                  rows={3}
+                  className="w-full rounded-2xl border border-[#d0d0d0] bg-white px-4 py-3 text-[#212121] outline-none transition focus:border-[#595959]"
+                />
+              </div>
+            </div>
+
+            <button
+              onClick={handleGenerate}
+              className="rounded-full bg-[#32e979] px-8 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-[#22e58b]"
+            >
+              generate branded video
+            </button>
+          </main>
+        </div>
+      </>
+    );
+  }
+
   if (showProcessing) {
     return (
       <>
         <Head>
           <title>Super Content - Processing</title>
+          <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet" />
         </Head>
         <div className="min-h-screen bg-[#f9f9f9] text-[#595959]">
           <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-6">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <div className="relative">
                 <div className="absolute -inset-3 rounded-full bg-[#32e979]/30 blur-xl" />
-                <div className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#32e979] to-[#22e58b] shadow-lg">
-                  <div className="flex h-0 w-0 border-y-[8px] border-l-[14px] border-y-transparent border-l-white" style={{ marginLeft: '3px' }} />
+                <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#32e979] to-[#22e58b] shadow-lg">
+                  <svg width="22" height="23" viewBox="0 0 21.646 22.637" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M 18.877 9.871 C 20.046 10.482 20.046 12.155 18.877 12.766 L 2.391 21.387 C 1.303 21.955 0 21.166 0 19.939 L 0 2.698 C 0 1.47 1.303 0.681 2.391 1.25 Z" fill="white" filter="drop-shadow(0px 2.72px 1px rgba(196, 196, 196, 1))"/>
+                  </svg>
                 </div>
               </div>
-              <span className="font-['Bangers'] text-2xl italic text-[#212121]">SUPER CONTENT</span>
+              <span style={{ fontFamily: 'Bangers, sans-serif' }} className="text-2xl italic text-[#212121]">SUPER CONTENT</span>
             </div>
           </header>
 
@@ -113,7 +188,7 @@ export default function TikTokResultsPage() {
               <div className="mx-auto h-16 w-16 animate-spin rounded-full border-4 border-[#d0d0d0] border-t-[#32e979]" />
               <div className="space-y-2">
                 <h1 className="text-3xl font-normal text-[#595959]">
-                  generating your tiktok...
+                  generating your branded video...
                 </h1>
                 <p className="text-sm text-[#595959]">
                   this will take a few seconds
@@ -128,53 +203,59 @@ export default function TikTokResultsPage() {
 
   return (
     <>
-      <Head>
-        <title>Super Content - Results</title>
-        <meta
-          name="description"
-          content="Preview the TikTok concepts generated from your brand keywords."
-        />
-      </Head>
-      <div className="min-h-screen bg-[#f9f9f9] text-[#595959]">
-        <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-6">
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <div className="absolute -inset-3 rounded-full bg-[#32e979]/30 blur-xl" />
-              <div className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#32e979] to-[#22e58b] shadow-lg">
-                <div className="flex h-0 w-0 border-y-[8px] border-l-[14px] border-y-transparent border-l-white" style={{ marginLeft: '3px' }} />
+        <Head>
+          <title>Super Content - Results</title>
+          <meta
+            name="description"
+            content="Preview the TikTok concepts generated from your brand keywords."
+          />
+          <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet" />
+        </Head>
+        <div className="min-h-screen bg-[#f9f9f9] text-[#595959]">
+          <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-6">
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <div className="absolute -inset-3 rounded-full bg-[#32e979]/30 blur-xl" />
+                <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#32e979] to-[#22e58b] shadow-lg">
+                  <svg width="22" height="23" viewBox="0 0 21.646 22.637" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M 18.877 9.871 C 20.046 10.482 20.046 12.155 18.877 12.766 L 2.391 21.387 C 1.303 21.955 0 21.166 0 19.939 L 0 2.698 C 0 1.47 1.303 0.681 2.391 1.25 Z" fill="white" filter="drop-shadow(0px 2.72px 1px rgba(196, 196, 196, 1))"/>
+                  </svg>
+                </div>
               </div>
+              <span style={{ fontFamily: 'Bangers, sans-serif' }} className="text-2xl italic text-[#212121]">SUPER CONTENT</span>
             </div>
-            <span className="font-['Bangers'] text-2xl italic text-[#212121]">SUPER CONTENT</span>
-          </div>
-          <nav className="hidden items-center gap-8 text-sm font-medium text-[#595959] md:flex">
-            <a href="#" className="transition hover:text-[#212121]">
-              Why Super Content?
-            </a>
-            <a href="#" className="transition hover:text-[#212121]">
-              Product
-            </a>
-            <a href="#" className="transition hover:text-[#212121]">
-              Pricing
-            </a>
-            <a href="#" className="transition hover:text-[#212121]">
-              Resources
-            </a>
-            <a href="#" className="text-[#212121] transition hover:text-[#595959]">
-              login
-            </a>
-            <a href="#" className="rounded-full bg-[#32e979] px-6 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-[#22e58b]">
-              Sign Up
-            </a>
-          </nav>
-        </header>
+            <nav className="hidden items-center gap-8 text-sm font-medium text-[#595959] md:flex">
+              <a href="#" className="transition hover:text-[#212121]">
+                Why Super Content?
+              </a>
+              <a href="#" className="transition hover:text-[#212121]">
+                Product
+              </a>
+              <a href="#" className="transition hover:text-[#212121]">
+                Pricing
+              </a>
+              <a href="#" className="transition hover:text-[#212121]">
+                Resources
+              </a>
+              <a href="#" className="transition hover:text-[#212121]">
+                Book a demo
+              </a>
+              <a href="#" className="text-[#212121] transition hover:text-[#595959]">
+                login
+              </a>
+              <a href="#" className="rounded-full bg-[#32e979] px-6 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-[#22e58b]">
+                Sign Up
+              </a>
+            </nav>
+          </header>
 
-        <main className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-6 pb-24 pt-12">
+          <main className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-6 pb-24 pt-12">
           <div className="space-y-3">
             <h1 className="text-4xl font-normal leading-tight text-[#595959] sm:text-5xl">
               select a video to remix
             </h1>
             <p className="max-w-2xl text-base text-[#595959]">
-              choose one video and we'll generate a new tiktok based on your selection
+              choose one video and we'll generate a branded video based on your selection
             </p>
           </div>
 
@@ -208,16 +289,16 @@ export default function TikTokResultsPage() {
           <section className="mt-8 flex flex-col gap-4 rounded-3xl border border-[#d0d0d0] bg-white px-8 py-6 text-sm sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-lg font-semibold text-[#212121]">
-                {selectedVideo ? "ready to generate!" : "no video selected"}
+                {selectedVideo ? "ready to continue!" : "no video selected"}
               </h2>
               <p className="text-[#595959]">
                 {selectedVideo
-                  ? "click generate to create your tiktok"
+                  ? "add your logo and customize the copy"
                   : "select a video to continue"}
               </p>
             </div>
             <button
-              onClick={handleGenerate}
+              onClick={handleContinueToUpload}
               disabled={!selectedVideo}
               className={`inline-flex items-center justify-center rounded-full px-8 py-3 text-sm font-semibold text-white shadow-lg transition ${
                 selectedVideo
@@ -225,7 +306,7 @@ export default function TikTokResultsPage() {
                   : "cursor-not-allowed bg-[#d0d0d0]"
               }`}
             >
-              generate tiktok
+              continue
             </button>
           </section>
         </main>

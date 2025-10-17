@@ -21,17 +21,20 @@ export default function StartPage() {
           name="description"
           content="Tell us about your brand and we'll spin up on-brand TikTok content."
         />
+        <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet" />
       </Head>
       <div className="min-h-screen bg-[#f9f9f9] text-[#595959]">
         <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-6">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <div className="relative">
               <div className="absolute -inset-3 rounded-full bg-[#32e979]/30 blur-xl" />
-              <div className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#32e979] to-[#22e58b] shadow-lg">
-                <div className="flex h-0 w-0 border-y-[8px] border-l-[14px] border-y-transparent border-l-white" style={{ marginLeft: '3px' }} />
+              <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#32e979] to-[#22e58b] shadow-lg">
+                <svg width="22" height="23" viewBox="0 0 21.646 22.637" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M 18.877 9.871 C 20.046 10.482 20.046 12.155 18.877 12.766 L 2.391 21.387 C 1.303 21.955 0 21.166 0 19.939 L 0 2.698 C 0 1.47 1.303 0.681 2.391 1.25 Z" fill="white" filter="drop-shadow(0px 2.72px 1px rgba(196, 196, 196, 1))"/>
+                </svg>
               </div>
             </div>
-            <span className="font-['Bangers'] text-2xl italic text-[#212121]">SUPER CONTENT</span>
+            <span style={{ fontFamily: 'Bangers, sans-serif' }} className="text-2xl italic text-[#212121]">SUPER CONTENT</span>
           </div>
           <nav className="hidden items-center gap-8 text-sm font-medium text-[#595959] md:flex">
             <a href="#" className="transition hover:text-[#212121]">
@@ -46,6 +49,9 @@ export default function StartPage() {
             <a href="#" className="transition hover:text-[#212121]">
               Resources
             </a>
+            <a href="#" className="transition hover:text-[#212121]">
+              Book a demo
+            </a>
             <a href="#" className="text-[#212121] transition hover:text-[#595959]">
               login
             </a>
@@ -56,7 +62,7 @@ export default function StartPage() {
         </header>
 
         <main className="mx-auto flex w-full max-w-3xl flex-col items-center justify-center px-6 py-32">
-          <h1 className="mb-12 text-center text-4xl font-normal leading-tight text-[#595959] md:text-5xl">
+          <h1 className="mb-12 text-center text-[40px] font-normal leading-tight text-[#595959] md:text-[56px]">
             Give me some keywords related to your brand:
           </h1>
           
@@ -79,19 +85,5 @@ export default function StartPage() {
         </main>
       </div>
     </>
-  );
-}
-
-type CardProps = {
-  title: string;
-  description: string;
-};
-
-function Card({ title, description }: CardProps) {
-  return (
-    <div className="space-y-3 rounded-[40px] border border-black/5 bg-white px-6 py-8 shadow-[0_10px_30px_rgba(33,33,33,0.08)]">
-      <h3 className="text-xl font-semibold text-[#212121]">{title}</h3>
-      <p className="text-sm leading-relaxed text-[#3f3f3f]">{description}</p>
-    </div>
   );
 }
