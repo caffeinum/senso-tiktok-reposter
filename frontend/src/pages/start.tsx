@@ -11,7 +11,7 @@ type Props = {
 const BASE_URL = "https://top-tasks-865976.framer.app";
 
 export const getStaticProps: GetStaticProps<Props> = async () => {
-  const filePath = path.join(process.cwd(), "public", "reference", "1.html");
+  const filePath = path.join(process.cwd(), "public", "reference", "2.html");
   const rawHtml = await fs.readFile(filePath, "utf8");
 
   const headMatch = rawHtml.match(/<head[^>]*>([\s\S]*?)<\/head>/i);
@@ -20,15 +20,8 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
   const headHtml = headMatch?.[1] ?? "";
   let bodyHtml = bodyMatch?.[1] ?? "";
 
-  // normalise links to local routes
   bodyHtml = bodyHtml.replace(new RegExp(`${BASE_URL}/2`, "g"), "/start");
   bodyHtml = bodyHtml.replace(new RegExp(`${BASE_URL}/?`, "g"), "/");
-
-  // ensure "Start Creating" button routes to /start
-  bodyHtml = bodyHtml.replace(
-    /(<a\b[^>]*>[^<]*Start Creating[^<]*<\/a>)/i,
-    (match) => match.replace(/href="[^"]*"/, 'href="/start"'),
-  );
 
   return {
     props: {
@@ -38,7 +31,7 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
   };
 };
 
-export default function HomePage({
+export default function StartPage({
   headHtml,
   bodyHtml,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
