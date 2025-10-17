@@ -1,29 +1,39 @@
-# Create T3 App
+# Airia Agent Playground
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+This frontend is a small Next.js (T3 stack) playground that proxies browser input to an Airia pipeline while keeping your API key on the server. Each browser session receives an anonymous `userId`, so you can experiment with per-user memory or multi-turn flows without exposing real identities.
 
-## What's next? How do I make an app with this?
+## Prerequisites
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+- Node 18+ or Bun 1.1+
+- An Airia API key with access to the pipeline `add4efac-37f8-4a82-bad7-cc94c1a8055b`
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+## Setup
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+```bash
+cp .env.example .env
+# edit .env and set AIRIA_API_KEY (pipeline ID already defaults to add4e...)
 
-## Learn More
+bun install   # or npm install / pnpm install
+bun run dev   # or npm run dev / pnpm dev
+```
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+Visit `http://localhost:3000` and you’ll see a text area with a generated session ID. Submit prompts to send them through `/api/airia`, which proxies the request to the Airia API and returns the JSON response for inspection.
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+## How it Works
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+- **Anonymous sessions** – The browser stores a UUID in `sessionStorage` (`airia-anon-user-id`) so each tab gets a stable identifier.
+- **API proxy** – `/api/airia` injects `AIRIA_API_KEY` and forwards requests to `https://api.airia.ai/v2/PipelineExecution/{AIRIA_PIPELINE_ID}`. The frontend never touches the secret.
+- **Response viewer** – Successful responses are rendered as formatted JSON; failures display the error message surfaced by the proxy.
 
-## How do I deploy this?
+## Environment Variables
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+```bash
+AIRIA_API_KEY=sk_live_your_key_here
+AIRIA_PIPELINE_ID=add4efac-37f8-4a82-bad7-cc94c1a8055b
+```
+
+`AIRIA_PIPELINE_ID` is configurable in case you want to point at a different pipeline later.
+
+## Deploying
+
+Any platform that supports Next.js (Vercel, Netlify, Render, etc.) will work. Remember to set the same environment variables in your hosting provider; the proxy route relies on them at runtime.

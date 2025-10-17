@@ -8,6 +8,8 @@ export const env = createEnv({
    */
   server: {
     NODE_ENV: z.enum(["development", "test", "production"]),
+    AIRIA_API_KEY: z.string().min(1),
+    AIRIA_PIPELINE_ID: z.string().min(1),
   },
 
   /**
@@ -25,6 +27,8 @@ export const env = createEnv({
    */
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
+    AIRIA_API_KEY: process.env.AIRIA_API_KEY,
+    AIRIA_PIPELINE_ID: process.env.AIRIA_PIPELINE_ID,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**
