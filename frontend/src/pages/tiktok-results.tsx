@@ -1,7 +1,7 @@
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function TikTokResultsPage() {
   const router = useRouter();
@@ -31,11 +31,17 @@ export default function TikTokResultsPage() {
 
   const handleGenerate = () => {
     setShowProcessing(true);
-    setTimeout(() => {
-      setShowProcessing(false);
-      setShowResult(true);
-    }, 3000);
   };
+
+  useEffect(() => {
+    if (showProcessing) {
+      const timer = setTimeout(() => {
+        setShowProcessing(false);
+        setShowResult(true);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showProcessing]);
 
   if (showResult) {
     return (
