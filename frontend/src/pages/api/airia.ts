@@ -47,7 +47,15 @@ export default async function handler(
       }),
     });
 
-    const payload = await response.json().catch(() => null);
+    const raw = await response.text();
+    let payload: unknown = null;
+    if (raw) {
+      try {
+        payload = JSON.parse(raw);
+      } catch {
+        payload = raw;
+      }
+    }
 
     if (!response.ok) {
       return res.status(response.status).json({
