@@ -3,13 +3,14 @@
 ## Project Structure & Module Organization
 - `repurpose/`: houses `cli_repurpose.py` and its README; focuses on content ingestion and generation flows.
 - `support-hub/`: contains `cli_support_hub.py` and documentation for the FAQ search workflow.
-- Root files: `README.md` (overview and quick start) and `LICENSE`. Keep new shared utilities near the scripts they serve; factor reusable helpers into `common/` if they grow beyond 50 lines.
+- Root tooling: `read_senso.py` (content fetch/search helper), `README.md`, and `LICENSE`. Keep utilities beside their script; extract to `common/` once they pass 50 lines.
 
 ## Setup, Build & Run
 - `python -m venv .venv && source .venv/bin/activate`: recommended isolated environment.
 - `pip install requests rich`: installs current runtime dependencies; pin versions when adding new libs.
 - `python support-hub/cli_support_hub.py <faq_url>`: run the crawler + search demo end to end.
 - `python repurpose/cli_repurpose.py <article_url>`: execute the repurposing pipeline and persist outputs.
+- `uv run --with requests --with rich --env-file .env python read_senso.py --content-id <id>`: one-shot execution with ephemeral deps and environment loading.
 
 ## Coding Style & Naming Conventions
 - Python 3.10+, 4-space indentation, type hints on new functions that touch API boundaries.
@@ -29,4 +30,5 @@
 
 ## Security & Configuration Tips
 - Never commit `SENSO_KEY` or `FIRECRAWL_KEY`; load them via environment variables or `.env` ignored by git.
+- `.env` should include Senso keys and optional `SENSO_ORG_ID`; verify new secrets stay listed in `.gitignore`.
 - Audit external scraping changes for rate limits and robots.txt compliance before shipping.
