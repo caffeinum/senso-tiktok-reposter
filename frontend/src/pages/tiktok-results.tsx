@@ -7,26 +7,22 @@ export default function TikTokResultsPage() {
   const router = useRouter();
   const queryParam = router.query.query;
   const keyword = Array.isArray(queryParam) ? queryParam[0] : queryParam;
-  const [selectedVideos, setSelectedVideos] = useState<string[]>([]);
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
   const [showProcessing, setShowProcessing] = useState(false);
   const [showResult, setShowResult] = useState(false);
 
   const videos = [
     "https://api.apify.com/v2/key-value-stores/fPv7REDpL3IxnkKLr/records/video-jixiewang-20220520043751-7099673155060452654.mp4",
     "https://api.apify.com/v2/key-value-stores/fPv7REDpL3IxnkKLr/records/video-happyhome_-20220505183502-7094322616432954670.mp4",
-    "https://api.apify.com/v2/key-value-stores/fPv7REDpL3IxnkKLr/records/video-jixiewang-20220520043751-7099673155060452654.mp4",
+    "https://api.apify.com/v2/key-value-stores/kTZXe4EZAUAwPUq0z/records/video-quangminh_-20251014230959-7561218578016472351.mp4",
   ];
 
   const handleVideoSelect = (videoUrl: string) => {
-    if (selectedVideos.includes(videoUrl)) {
-      setSelectedVideos(selectedVideos.filter((v) => v !== videoUrl));
-    } else if (selectedVideos.length < 3) {
-      setSelectedVideos([...selectedVideos, videoUrl]);
-    }
+    setSelectedVideo(videoUrl);
   };
 
   const handleGenerate = () => {
-    if (selectedVideos.length === 3) {
+    if (selectedVideo) {
       setShowProcessing(true);
       setTimeout(() => {
         setShowProcessing(false);
@@ -80,7 +76,7 @@ export default function TikTokResultsPage() {
               <button
                 onClick={() => {
                   setShowResult(false);
-                  setSelectedVideos([]);
+                  setSelectedVideo(null);
                 }}
                 className="rounded-full border border-[#d0d0d0] bg-white px-8 py-3 text-sm font-semibold text-[#595959] transition hover:bg-[#f5f5f5]"
               >
@@ -175,77 +171,56 @@ export default function TikTokResultsPage() {
         <main className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-6 pb-24 pt-12">
           <div className="space-y-3">
             <h1 className="text-4xl font-normal leading-tight text-[#595959] sm:text-5xl">
-              select 3 videos to remix
+              select a video to remix
             </h1>
             <p className="max-w-2xl text-base text-[#595959]">
-              choose exactly 3 videos and we'll generate a new tiktok based on your selections
+              choose one video and we'll generate a new tiktok based on your selection
             </p>
           </div>
 
-          <div className="grid gap-8 lg:grid-cols-[1fr_auto]">
-            <section className="grid gap-6 md:grid-cols-2">
-              <ResultCard
-                title="Hook + Script"
-                description="snappy intro, 30-second talking points, and cta ready for filming."
-              />
-              <ResultCard
-                title="Caption + Hashtags"
-                description="scroll-stopping caption with optimized hashtags and emoji to boost reach."
-              />
-              <ResultCard
-                title="Voiceover Outline"
-                description="narration cues that match your brand tone with visual beat suggestions."
-              />
-              <ResultCard
-                title="B-Roll Checklist"
-                description="shot list for b-roll that keeps production focused and on-message."
-              />
-            </section>
-
-            <aside className="flex flex-col gap-4">
-              {videos.map((videoUrl, idx) => (
-                <div
-                  key={idx}
-                  className="relative cursor-pointer"
-                  onClick={() => handleVideoSelect(videoUrl)}
-                >
-                  <video
-                    src={videoUrl}
-                    loop
-                    muted
-                    playsInline
-                    className={`h-[500px] w-[280px] rounded-2xl border-4 bg-black object-cover shadow-lg transition ${
-                      selectedVideos.includes(videoUrl)
-                        ? "border-[#32e979]"
-                        : "border-[#d0d0d0]"
-                    }`}
-                  />
-                  {selectedVideos.includes(videoUrl) && (
-                    <div className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-[#32e979] text-sm font-bold text-white shadow-lg">
-                      {selectedVideos.indexOf(videoUrl) + 1}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </aside>
+          <div className="flex flex-wrap justify-center gap-4">
+            {videos.map((videoUrl, idx) => (
+              <div
+                key={idx}
+                className="relative cursor-pointer"
+                onClick={() => handleVideoSelect(videoUrl)}
+              >
+                <video
+                  src={videoUrl}
+                  loop
+                  muted
+                  playsInline
+                  className={`h-[500px] w-[280px] rounded-2xl border-4 bg-black object-cover shadow-lg transition ${
+                    selectedVideo === videoUrl
+                      ? "border-[#32e979]"
+                      : "border-[#d0d0d0]"
+                  }`}
+                />
+                {selectedVideo === videoUrl && (
+                  <div className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-[#32e979] text-sm font-bold text-white shadow-lg">
+                    ✓
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
 
           <section className="mt-8 flex flex-col gap-4 rounded-3xl border border-[#d0d0d0] bg-white px-8 py-6 text-sm sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-lg font-semibold text-[#212121]">
-                {selectedVideos.length === 3 ? "ready to generate!" : `${selectedVideos.length}/3 videos selected`}
+                {selectedVideo ? "ready to generate!" : "no video selected"}
               </h2>
               <p className="text-[#595959]">
-                {selectedVideos.length === 3
+                {selectedVideo
                   ? "click generate to create your tiktok"
-                  : "select 3 videos to continue"}
+                  : "select a video to continue"}
               </p>
             </div>
             <button
               onClick={handleGenerate}
-              disabled={selectedVideos.length !== 3}
+              disabled={!selectedVideo}
               className={`inline-flex items-center justify-center rounded-full px-8 py-3 text-sm font-semibold text-white shadow-lg transition ${
-                selectedVideos.length === 3
+                selectedVideo
                   ? "bg-[#32e979] hover:bg-[#22e58b]"
                   : "cursor-not-allowed bg-[#d0d0d0]"
               }`}
@@ -259,20 +234,4 @@ export default function TikTokResultsPage() {
   );
 }
 
-type ResultCardProps = {
-  title: string;
-  description: string;
-};
 
-function ResultCard({ title, description }: ResultCardProps) {
-  return (
-    <div className="rounded-3xl border border-[#d0d0d0] bg-white p-6 shadow-sm">
-      <h3 className="text-xl font-semibold text-[#212121]">{title}</h3>
-      <p className="mt-3 text-sm leading-relaxed text-[#595959]">{description}</p>
-      <button className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[#32e979] transition hover:text-[#22e58b]">
-        download example
-        <span aria-hidden="true">↘</span>
-      </button>
-    </div>
-  );
-}
