@@ -30,6 +30,7 @@ export default function TikTokResultsPage() {
   };
 
   const handleGenerate = () => {
+    setShowUploadStep(false);
     setShowProcessing(true);
   };
 
