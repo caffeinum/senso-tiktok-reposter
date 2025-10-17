@@ -3,13 +3,14 @@
 ## Project Structure & Module Organization
 - `repurpose/`: houses `cli_repurpose.py` and its README; focuses on ingesting TikTok datasets and generating follow-on assets.
 - `support-hub/`: contains `cli_support_hub.py` and documentation for the interactive search workflow backed by TikTok data.
-- Root files: `read_senso.py`, `README.md`, and `LICENSE`. Keep helpers near their scripts; extract to `common/` when they exceed 50 lines.
+- Root files: `ingest_urls.py`, `read_senso.py`, `README.md`, and `LICENSE`. Keep helpers near their scripts; extract to `common/` when they exceed 50 lines.
 
 ## Setup, Build & Run
 - `python -m venv .venv && source .venv/bin/activate`: recommended isolated environment.
 - `pip install requests rich`: installs current runtime dependencies; pin versions when adding new libs.
 - `python support-hub/cli_support_hub.py --profiles tiktok --results-per 3`: fetch TikTok clips through Apify (forces video downloads), ingest, and open the search loop. Run without flags to be prompted for profiles/hashtags/queries.
 - `python repurpose/cli_repurpose.py --profile tiktok --results 3`: run the repurposing pipeline and persist generated assets. Run without flags to pick the source interactively.
+- `uv run --with requests --with beautifulsoup4 --env-file .env python ingest_urls.py <url>`: ingest arbitrary URLs as raw content when Firecrawl/Apify flows aren’t needed.
 - `uv run --with requests --with rich --env-file .env python read_senso.py --content-id <id>`: one-shot execution with ephemeral deps and environment loading.
 
 ## Coding Style & Naming Conventions
