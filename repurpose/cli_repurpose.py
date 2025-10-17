@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 """
 CLI Content Repurposer
-Scrape a single blog article → ingest as **raw** content in Senso →
+Scrape TikTok videos via Apify → ingest as **raw** content in Senso →
 generate a tweet thread, LinkedIn blurb, and email teaser (all saved).
 
 USAGE
   export SENSO_KEY="sk_prod_xxx"
-  export FIRECRAWL_KEY="fc_live_xxx"
-  python cli_repurpose.py https://medium.com/data-science/top-10-data-ai-trends-for-2025-4ed785cafe16
+  export APIFY_TOKEN="apify_api_xxx"
+  python cli_repurpose.py --profile tiktok
 """
 
 import argparse
 import os
 import sys
 import time
-from typing import Dict, Tuple
+from typing import Any, Dict, List
 
 import requests
 from rich.console import Console
@@ -23,30 +23,66 @@ from rich.table import Table
 # --------------------------------------------------------------------------- #
 # Config                                                                      #
 # --------------------------------------------------------------------------- #
-SENSO_API     = "https://sdk.senso.ai/api/v1"
-FIRECRAWL_API = "https://api.firecrawl.dev/v1/scrape"
+SENSO_API = "https://sdk.senso.ai/api/v1"
+APIFY_RUN_SYNC_ITEMS = (
+    "https://api.apify.com/v2/acts/clockworks~tiktok-scraper/run-sync-get-dataset-items"
+)
 POLL_INTERVAL = 3  # seconds
 
 console = Console()
 
 # --------------------------------------------------------------------------- #
-# Firecrawl helper                                                            #
+# Apify helper                                                                #
 # --------------------------------------------------------------------------- #
-def scrape(url: str, fc_key: str) -> Tuple[str, str]:
-    payload = {"url": url, "formats": ["markdown"], "onlyMainContent": True}
-    headers = {"Authorization": f"Bearer {fc_key}", "Content-Type": "application/json"}
-
-    resp = requests.post(FIRECRAWL_API, json=payload, headers=headers, timeout=60)
+def run_apify_actor(
+    actor_input: Dict[str, Any], token: str, timeout: int = 120
+) -> List[Dict[str, Any]]:
+    params = {"token": token}
+    headers = {"Content-Type": "application/json"}
+    resp = requests.post(
+        APIFY_RUN_SYNC_ITEMS, params=params, json=actor_input, headers=headers, timeout=timeout
+    )
     resp.raise_for_status()
-    outer = resp.json()
+    data = resp.json()
+    if isinstance(data, dict) and data.get("error"):
+        raise RuntimeError(f"Apify error: {data}")
+    if not isinstance(data, list):
+        raise RuntimeError(f"Unexpected Apify payload: {type(data)}")
+    return data
 
-    if not outer.get("success"):
-        raise RuntimeError(f"Firecrawl failed for {url}: {outer}")
 
-    data = outer["data"]
-    title = data["metadata"].get("title") or url
-    markdown = data["markdown"]
-    return title, markdown
+def items_to_markdown(descriptor: str, items: List[Dict[str, Any]]) -> str:
+    lines: List[str] = [f"# TikTok dataset for {descriptor}", ""]
+
+    for idx, item in enumerate(items, start=1):
+        author = item.get("authorMeta", {}) or {}
+        author_name = author.get("nickName") or author.get("name") or "unknown author"
+        handle = author.get("name") or ""
+        caption = (item.get("text") or "").strip() or "<no caption>"
+        stats = {
+            "likes": item.get("diggCount"),
+            "comments": item.get("commentCount"),
+            "shares": item.get("shareCount"),
+            "plays": item.get("playCount"),
+        }
+        stat_text = ", ".join(f"{name}={value}" for name, value in stats.items() if isinstance(value, int))
+        video_url = item.get("webVideoUrl") or author.get("profileUrl") or "n/a"
+        published = item.get("createTimeISO") or str(item.get("createTime") or "unknown")
+
+        lines.append(f"## Video {idx} — {item.get('id', 'unknown')}")
+        lines.append(f"- Author: {author_name} (@{handle})" if handle else f"- Author: {author_name}")
+        lines.append(f"- Published: {published}")
+        lines.append(f"- URL: {video_url}")
+        if stat_text:
+            lines.append(f"- Stats: {stat_text}")
+        hashtags = ", ".join(f"#{h.get('name')}" for h in item.get("hashtags", []) if h.get("name"))
+        if hashtags:
+            lines.append(f"- Hashtags: {hashtags}")
+        lines.append("")
+        lines.append(caption)
+        lines.append("")
+
+    return "\n".join(lines).strip()
 
 # --------------------------------------------------------------------------- #
 # Senso helpers                                                               #
@@ -103,19 +139,82 @@ def generate(instructions: str, senso_key: str) -> Dict:
 # --------------------------------------------------------------------------- #
 # Main                                                                        #
 # --------------------------------------------------------------------------- #
-def main(url: str) -> None:
+def main(args: argparse.Namespace) -> None:
     senso_key = os.getenv("SENSO_KEY")
-    fc_key = os.getenv("FIRECRAWL_KEY")
-    if not senso_key or not fc_key:
-        console.print(":warning:  Set SENSO_KEY and FIRECRAWL_KEY env vars first.")
+    apify_token = os.getenv("APIFY_TOKEN")
+    if not senso_key or not apify_token:
+        console.print(":warning:  Set SENSO_KEY and APIFY_TOKEN env vars first.")
         sys.exit(1)
 
-    console.print(f"[bold]Scraping blog:[/bold] {url}")
-    title, md = scrape(url, fc_key)
-    console.print(f"→ got {len(md):,} chars")
+    descriptors = [
+        ("Profile", "profiles", args.profile),
+        ("Hashtag", "hashtags", args.hashtag),
+        ("Search", "searchQueries", args.search_query),
+    ]
+    provided = [(label, field, value) for label, field, value in descriptors if value]
+
+    if len(provided) != 1:
+        console.print(
+            "\n[bold]No source selected.[/bold] Choose one of the options below."
+        )
+        console.print("  [1] TikTok profile")
+        console.print("  [2] TikTok hashtag")
+        console.print("  [3] TikTok search query")
+
+        choice_map = {
+            "1": ("Profile", "profiles"),
+            "2": ("Hashtag", "hashtags"),
+            "3": ("Search", "searchQueries"),
+        }
+        selection = ""
+        while selection not in choice_map:
+            selection = console.input("[bold blue]Select (1/2/3): [/bold blue]").strip()
+        label, field = choice_map[selection]
+        value = ""
+        prompts = {
+            "profiles": "Enter TikTok username",
+            "hashtags": "Enter TikTok hashtag (no #)",
+            "searchQueries": "Enter TikTok search query",
+        }
+        while not value:
+            value = console.input(f"[bold blue]{prompts[field]}: [/bold blue]").strip()
+        provided = [(label, field, value)]
+
+    label, field, value = provided[0]
+    descriptor = f"{label} {value}"
+
+    actor_input: Dict[str, Any] = {
+        field: [value],
+        "resultsPerPage": args.results,
+        "shouldDownloadVideos": True,
+        "shouldDownloadAvatars": False,
+        "shouldDownloadCovers": False,
+        "shouldDownloadMusicCovers": False,
+        "shouldDownloadSlideshowImages": False,
+        "shouldDownloadSubtitles": False,
+        "scrapeRelatedVideos": False,
+        "proxyCountryCode": "US",
+    }
+    if field == "profiles":
+        actor_input.update(
+            {
+                "excludePinnedPosts": False,
+                "profileScrapeSections": ["videos"],
+                "profileSorting": "latest",
+            }
+        )
+
+    console.print(f"[bold]Retrieving TikTok data:[/bold] {descriptor}")
+    items = run_apify_actor(actor_input, apify_token)
+    if not items:
+        console.print(f":warning:  No TikTok records found for {descriptor}")
+        sys.exit(1)
+
+    markdown = items_to_markdown(descriptor, items)
+    console.print(f"→ harvested {len(items)} videos; {len(markdown):,} chars")
 
     console.print("Uploading article to Senso …")
-    cid = post_raw(title, md, senso_key)
+    cid = post_raw(descriptor, markdown, senso_key)
     console.print(f"→ content_id = {cid}")
 
     poll_status(cid, senso_key)
@@ -154,8 +253,15 @@ def main(url: str) -> None:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Repurpose a blog article into multiple marketing assets."
+        description="Repurpose TikTok data into multiple marketing assets."
     )
-    parser.add_argument("url", help="URL of the blog post")
-    args = parser.parse_args()
-    main(args.url)
+    parser.add_argument("--profile", help="TikTok username to scrape.")
+    parser.add_argument("--hashtag", help="TikTok hashtag to scrape (no #).")
+    parser.add_argument("--search-query", help="TikTok search query to scrape.")
+    parser.add_argument(
+        "--results",
+        type=int,
+        default=5,
+        help="Number of videos to fetch for the selected descriptor.",
+    )
+    main(parser.parse_args())

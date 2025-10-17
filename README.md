@@ -4,10 +4,10 @@ Two tiny scripts that show what you can build with the Senso API in under 200 LO
 
 | Demo | What it does | Key Senso endpoints |
 |------|--------------|---------------------|
-| **`cli_support_hub.py`** | Crawl public help pages, ingest them as **raw** content, then open an interactive terminal search. | `/content/raw` &nbsp; `/content/{id}` &nbsp; `/search` |
-| **`cli_repurpose.py`** | Scrape one blog post, ingest it, then autogenerate a tweet-thread, LinkedIn post, and email teaser (all saved). | `/content/raw` &nbsp; `/content/{id}` &nbsp; `/generate` |
+| **`cli_support_hub.py`** | Pull TikTok data through Apify, ingest it as **raw** content, then open an interactive terminal search. | `/content/raw` &nbsp; `/content/{id}` &nbsp; `/search` |
+| **`cli_repurpose.py`** | Fetch TikTok clips, ingest them, then autogenerate a tweet-thread, LinkedIn post, and email teaser (all saved). | `/content/raw` &nbsp; `/content/{id}` &nbsp; `/generate` |
 
-Firecrawl is used for page scraping; Senso handles indexing, search, and generation.
+Apify handles the TikTok scraping (downloading videos and metadata); Senso handles indexing, search, and generation.
 
 ---
 
@@ -19,16 +19,18 @@ cd examples
 
 # API keys
 export SENSO_KEY="sk_prod_xxx"
-export FIRECRAWL_KEY="fc_live_xxx"
+export APIFY_TOKEN="apify_api_xxx"
 
 # deps
 pip install -r requirements.txt        # requests, rich
 
-# 1) Support hub search
-python cli_support_hub.py https://docs.acme.com/faq
+# 1) Support hub search (TikTok profiles, hashtags, search queries)
+#    omit the flags to enter values interactively
+python cli_support_hub.py --profiles tiktok
 
-# 2) Content repurposer
-python cli_repurpose.py https://blog.acme.com/ai-trends-2025
+# 2) Content repurposer (TikTok -> marketing assets)
+#    omit the flags to choose a source interactively
+python cli_repurpose.py --profile tiktok
 ```
 
 Each script streams progress, polls until Senso has indexed the content, and prints prettified results in your terminal.
