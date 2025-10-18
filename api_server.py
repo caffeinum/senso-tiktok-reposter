@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 
 import os
+import tempfile
+import subprocess
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import requests
 
@@ -36,6 +39,11 @@ class TikTokVideo(BaseModel):
     likes: Optional[int]
     comments: Optional[int]
     thumbnail: Optional[str]
+
+class GenerateVideoRequest(BaseModel):
+    video_url: str
+    logo_url: str
+    caption: str
 
 def run_apify_actor(actor_input: dict, token: str, timeout: int = 120) -> List[dict]:
     params = {"token": token}
@@ -121,6 +129,63 @@ async def search_tiktok(request: TikTokSearchRequest):
         })
 
     return {"videos": formatted_videos}
+
+@app.post("/api/video/generate")
+async def generate_branded_video(request: GenerateVideoRequest):
+    with tempfile.TemporaryDirectory() as tmpdir:
+        video_path = os.path.join(tmpdir, "input.mp4")
+        logo_path = os.path.join(tmpdir, "logo.png")
+        output_path = os.path.join(tmpdir, "output.mp4")
+        
+        try:
+            video_resp = requests.get(request.video_url, timeout=60)
+            video_resp.raise_for_status()
+            with open(video_path, "wb") as f:
+                f.write(video_resp.content)
+            
+            logo_resp = requests.get(request.logo_url, timeout=30)
+            logo_resp.raise_for_status()
+            with open(logo_path, "wb") as f:
+                f.write(logo_resp.content)
+            
+            caption_escaped = request.caption.replace("'", "'\\''").replace(":", "\\:")
+            
+            ffmpeg_cmd = [
+                "ffmpeg", "-i", video_path, "-i", logo_path,
+                "-filter_complex",
+                (
+                    f"[0:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,format=yuv420p[vid];"
+                    f"[vid]drawbox=y=ih-300:color=black@0.6:width=iw:height=300:t=fill[vid_grad];"
+                    f"[vid_grad]drawtext=text='{caption_escaped}':fontfile=/System/Library/Fonts/Helvetica.ttc:fontsize=48:fontcolor=white:x=(w-text_w)/2:y=h-250:borderw=2:bordercolor=black[vid_text];"
+                    f"[1:v]scale=200:-1[logo];"
+                    f"[vid_text][logo]overlay=x=(W-w)/2:y=H-150[final]"
+                ),
+                "-map", "[final]",
+                "-map", "0:a?",
+                "-c:v", "libx264",
+                "-preset", "fast",
+                "-c:a", "copy",
+                "-t", "30",
+                output_path
+            ]
+            
+            result = subprocess.run(ffmpeg_cmd, capture_output=True, text=True, timeout=120)
+            
+            if result.returncode != 0:
+                raise HTTPException(status_code=500, detail=f"FFmpeg failed: {result.stderr}")
+            
+            return FileResponse(
+                output_path,
+                media_type="video/mp4",
+                filename="branded_video.mp4"
+            )
+            
+        except requests.RequestException as e:
+            raise HTTPException(status_code=500, detail=f"Download failed: {str(e)}")
+        except subprocess.TimeoutExpired:
+            raise HTTPException(status_code=500, detail="Video processing timeout")
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Processing error: {str(e)}")
 
 @app.get("/health")
 async def health():
