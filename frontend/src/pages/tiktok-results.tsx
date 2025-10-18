@@ -14,9 +14,9 @@ export default function TikTokResultsPage() {
   const [brandCopy, setBrandCopy] = useState("When you're trying to build something big without Apify");
 
   const videos = [
-    "https://litter.catbox.moe/lf5lvwzhis0hd8py.mp4",
-    "https://api.apify.com/v2/key-value-stores/fPv7REDpL3IxnkKLr/records/video-happyhome_-20220505183502-7094322616432954670.mp4",
-    "https://api.apify.com/v2/key-value-stores/kTZXe4EZAUAwPUq0z/records/video-quangminh_-20251014230959-7561218578016472351.mp4",
+    { url: "https://litter.catbox.moe/lf5lvwzhis0hd8py.mp4", views: "12M" },
+    { url: "https://api.apify.com/v2/key-value-stores/fPv7REDpL3IxnkKLr/records/video-happyhome_-20220505183502-7094322616432954670.mp4", views: "34M" },
+    { url: "https://api.apify.com/v2/key-value-stores/kTZXe4EZAUAwPUq0z/records/video-quangminh_-20251014230959-7561218578016472351.mp4", views: "50M" },
   ];
 
   const handleVideoSelect = (videoUrl: string) => {
@@ -297,29 +297,32 @@ export default function TikTokResultsPage() {
           </div>
 
           <div className="flex w-3/4 flex-wrap justify-center gap-4">
-            {videos.map((videoUrl, idx) => (
+            {videos.map((video, idx) => (
               <div
                 key={idx}
-                className="relative cursor-pointer"
-                onClick={() => handleVideoSelect(videoUrl)}
+                className="cursor-pointer space-y-2"
+                onClick={() => handleVideoSelect(video.url)}
               >
-                <video
-                  src={videoUrl}
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className={`h-[500px] w-[280px] rounded-2xl border-4 bg-black object-cover shadow-lg transition ${
-                    selectedVideo === videoUrl
-                      ? "border-[#32e979]"
-                      : "border-[#d0d0d0]"
-                  }`}
-                />
-                {selectedVideo === videoUrl && (
-                  <div className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-[#32e979] text-sm font-bold text-white shadow-lg">
-                    ✓
-                  </div>
-                )}
+                <div className="relative">
+                  <video
+                    src={video.url}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className={`h-[500px] w-[280px] rounded-2xl border-4 bg-black object-cover shadow-lg transition ${
+                      selectedVideo === video.url
+                        ? "border-[#32e979]"
+                        : "border-[#d0d0d0]"
+                    }`}
+                  />
+                  {selectedVideo === video.url && (
+                    <div className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-[#32e979] text-sm font-bold text-white shadow-lg">
+                      ✓
+                    </div>
+                  )}
+                </div>
+                <p className="text-center text-sm text-[#595959]">{video.views} views</p>
               </div>
             ))}
           </div>
