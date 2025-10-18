@@ -260,17 +260,43 @@ export default function TikTokResultsPage() {
             </nav>
           </header>
 
-          <main className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-6 pb-24 pt-12">
-          <div className="space-y-3">
-            <h1 className="text-4xl font-normal leading-tight text-[#595959] sm:text-5xl">
-              select a video to remix
-            </h1>
-            <p className="max-w-2xl text-base text-[#595959]">
-              choose one video and we'll generate a branded video based on your selection
-            </p>
+          <main className="mx-auto flex w-full max-w-7xl gap-12 px-6 pb-24 pt-12">
+          <div className="flex w-1/4 flex-col gap-8">
+            <div className="space-y-3">
+              <h1 className="text-4xl font-normal leading-tight text-[#595959] sm:text-5xl">
+                select a video to remix
+              </h1>
+              <p className="text-base text-[#595959]">
+                choose one video and we'll generate a branded video based on your selection
+              </p>
+            </div>
+
+            <section className="flex flex-col gap-4 rounded-3xl border border-[#d0d0d0] bg-white px-8 py-6 text-sm">
+              <div>
+                <h2 className="text-lg font-semibold text-[#212121]">
+                  {selectedVideo ? "ready to continue!" : "no video selected"}
+                </h2>
+                <p className="text-[#595959]">
+                  {selectedVideo
+                    ? "add your logo and customize the copy"
+                    : "select a video to continue"}
+                </p>
+              </div>
+              <button
+                onClick={handleContinueToUpload}
+                disabled={!selectedVideo}
+                className={`inline-flex items-center justify-center rounded-full px-8 py-3 text-sm font-semibold text-white shadow-lg transition ${
+                  selectedVideo
+                    ? "bg-[#32e979] hover:bg-[#22e58b]"
+                    : "cursor-not-allowed bg-[#d0d0d0]"
+                }`}
+              >
+                continue
+              </button>
+            </section>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex w-3/4 flex-wrap justify-center gap-4">
             {videos.map((videoUrl, idx) => (
               <div
                 key={idx}
@@ -297,30 +323,6 @@ export default function TikTokResultsPage() {
               </div>
             ))}
           </div>
-
-          <section className="mt-8 flex flex-col gap-4 rounded-3xl border border-[#d0d0d0] bg-white px-8 py-6 text-sm sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-[#212121]">
-                {selectedVideo ? "ready to continue!" : "no video selected"}
-              </h2>
-              <p className="text-[#595959]">
-                {selectedVideo
-                  ? "add your logo and customize the copy"
-                  : "select a video to continue"}
-              </p>
-            </div>
-            <button
-              onClick={handleContinueToUpload}
-              disabled={!selectedVideo}
-              className={`inline-flex items-center justify-center rounded-full px-8 py-3 text-sm font-semibold text-white shadow-lg transition ${
-                selectedVideo
-                  ? "bg-[#32e979] hover:bg-[#22e58b]"
-                  : "cursor-not-allowed bg-[#d0d0d0]"
-              }`}
-            >
-              continue
-            </button>
-          </section>
         </main>
       </div>
     </>
