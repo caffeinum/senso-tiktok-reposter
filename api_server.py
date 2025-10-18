@@ -161,17 +161,25 @@ async def generate_branded_video(request: GenerateVideoRequest):
         else:
             os.rename(logo_raw_path, logo_path)
         
-        caption_escaped = request.caption.replace("'", "'\\''").replace(":", "\\:")
+        import textwrap
+        lines = textwrap.wrap(request.caption, width=30)
+        while len(lines) < 3:
+            lines.append("")
+        lines = lines[:3]
+        
+        escaped_lines = [line.replace("'", "'\\''").replace(":", "\\:") for line in lines]
         
         ffmpeg_cmd = [
             "ffmpeg", "-y", "-i", video_path, "-i", logo_path,
             "-filter_complex",
             (
                 f"[0:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,format=yuv420p[vid];"
-                f"[vid]drawbox=y=ih-300:color=black@0.6:width=iw:height=300:t=fill[vid_grad];"
-                f"[vid_grad]drawtext=text='{caption_escaped}':fontfile=/System/Library/Fonts/Helvetica.ttc:fontsize=48:fontcolor=white:x=(w-tw)/2:y=h-250:borderw=2:bordercolor=black[vid_text];"
+                f"[vid]drawbox=y=ih-350:color=black@0.6:width=iw:height=350:t=fill[vid_grad];"
+                f"[vid_grad]drawtext=text='{escaped_lines[0]}':fontfile=/System/Library/Fonts/Helvetica.ttc:fontsize=48:fontcolor=white:x=(w-tw)/2:y=h-320:borderw=2:bordercolor=black[t1];"
+                f"[t1]drawtext=text='{escaped_lines[1]}':fontfile=/System/Library/Fonts/Helvetica.ttc:fontsize=48:fontcolor=white:x=(w-tw)/2:y=h-260:borderw=2:bordercolor=black[t2];"
+                f"[t2]drawtext=text='{escaped_lines[2]}':fontfile=/System/Library/Fonts/Helvetica.ttc:fontsize=48:fontcolor=white:x=(w-tw)/2:y=h-200:borderw=2:bordercolor=black[vid_text];"
                 f"[1:v]scale=200:-1[logo];"
-                f"[vid_text][logo]overlay=x=(W-w)/2:y=H-280[final]"
+                f"[vid_text][logo]overlay=x=(W-w)/2:y=h-150[final]"
             ),
             "-map", "[final]",
             "-map", "0:a?",
