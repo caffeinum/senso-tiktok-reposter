@@ -20,11 +20,16 @@ export default function TikTokResultsPage() {
     { url: "https://api.apify.com/v2/key-value-stores/kTZXe4EZAUAwPUq0z/records/video-quangminh_-20251014230959-7561218578016472351.mp4", views: "50M" },
   ]);
   const [isLoadingVideos, setIsLoadingVideos] = useState(false);
+  const [loadingStartTime, setLoadingStartTime] = useState<number | null>(null);
+  const [elapsedTime, setElapsedTime] = useState(0);
 
   const fetchTikTokVideos = async () => {
     if (!keyword) return;
     
     setIsLoadingVideos(true);
+    setLoadingStartTime(Date.now());
+    setElapsedTime(0);
+    
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://senso-tiktok-reposter-production.up.railway.app";
       const response = await fetch(`${apiUrl}/api/tiktok/search`, {
@@ -50,6 +55,7 @@ export default function TikTokResultsPage() {
       console.error("Failed to fetch TikTok videos:", error);
     } finally {
       setIsLoadingVideos(false);
+      setLoadingStartTime(null);
     }
   };
 
@@ -58,6 +64,15 @@ export default function TikTokResultsPage() {
       fetchTikTokVideos();
     }
   }, [keyword]);
+
+  useEffect(() => {
+    if (loadingStartTime && isLoadingVideos) {
+      const interval = setInterval(() => {
+        setElapsedTime(Math.floor((Date.now() - loadingStartTime) / 1000));
+      }, 100);
+      return () => clearInterval(interval);
+    }
+  }, [loadingStartTime, isLoadingVideos]);
 
   const handleVideoSelect = (videoUrl: string) => {
     setSelectedVideo(videoUrl);
@@ -342,8 +357,16 @@ export default function TikTokResultsPage() {
 
           <div className="flex w-3/4 flex-wrap justify-center gap-4">
             {isLoadingVideos ? (
-              <div className="flex h-[500px] w-full items-center justify-center">
+              <div className="flex h-[500px] w-full flex-col items-center justify-center gap-6">
                 <div className="h-16 w-16 animate-spin rounded-full border-4 border-[#d0d0d0] border-t-[#32e979]" />
+                <div className="space-y-2 text-center">
+                  <p className="text-2xl font-semibold text-[#595959]">
+                    fetching tiktok videos...
+                  </p>
+                  <p className="text-base text-[#595959]">
+                    elapsed: {elapsedTime}s • usually takes ~90 seconds
+                  </p>
+                </div>
               </div>
             ) : (
               videos.map((video, idx) => (
