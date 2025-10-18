@@ -54,14 +54,7 @@ export default function TikTokResultsPage() {
         <div className="min-h-screen bg-[#f9f9f9] text-[#595959]">
           <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-6">
             <div className="flex items-center gap-3">
-              <div className="relative">
-                <div className="absolute -inset-3 rounded-full bg-[#32e979]/30 blur-xl" />
-                <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#32e979] to-[#22e58b] shadow-lg">
-                  <svg width="22" height="23" viewBox="0 0 21.646 22.637" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M 18.877 9.871 C 20.046 10.482 20.046 12.155 18.877 12.766 L 2.391 21.387 C 1.303 21.955 0 21.166 0 19.939 L 0 2.698 C 0 1.47 1.303 0.681 2.391 1.25 Z" fill="white" filter="drop-shadow(0px 2.72px 1px rgba(196, 196, 196, 1))"/>
-                  </svg>
-                </div>
-              </div>
+              <img src="/logo.png" alt="Super Content" className="h-16 w-16" />
               <span style={{ fontFamily: 'Bangers, sans-serif' }} className="text-2xl italic text-[#212121]">SUPER CONTENT</span>
             </div>
           </header>
@@ -119,14 +112,7 @@ export default function TikTokResultsPage() {
         <div className="min-h-screen bg-[#f9f9f9] text-[#595959]">
           <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-6">
             <div className="flex items-center gap-3">
-              <div className="relative">
-                <div className="absolute -inset-3 rounded-full bg-[#32e979]/30 blur-xl" />
-                <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#32e979] to-[#22e58b] shadow-lg">
-                  <svg width="22" height="23" viewBox="0 0 21.646 22.637" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M 18.877 9.871 C 20.046 10.482 20.046 12.155 18.877 12.766 L 2.391 21.387 C 1.303 21.955 0 21.166 0 19.939 L 0 2.698 C 0 1.47 1.303 0.681 2.391 1.25 Z" fill="white" filter="drop-shadow(0px 2.72px 1px rgba(196, 196, 196, 1))"/>
-                  </svg>
-                </div>
-              </div>
+              <img src="/logo.png" alt="Super Content" className="h-16 w-16" />
               <span style={{ fontFamily: 'Bangers, sans-serif' }} className="text-2xl italic text-[#212121]">SUPER CONTENT</span>
             </div>
           </header>
@@ -182,14 +168,7 @@ export default function TikTokResultsPage() {
         <div className="min-h-screen bg-[#f9f9f9] text-[#595959]">
           <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-6">
             <div className="flex items-center gap-3">
-              <div className="relative">
-                <div className="absolute -inset-3 rounded-full bg-[#32e979]/30 blur-xl" />
-                <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#32e979] to-[#22e58b] shadow-lg">
-                  <svg width="22" height="23" viewBox="0 0 21.646 22.637" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M 18.877 9.871 C 20.046 10.482 20.046 12.155 18.877 12.766 L 2.391 21.387 C 1.303 21.955 0 21.166 0 19.939 L 0 2.698 C 0 1.47 1.303 0.681 2.391 1.25 Z" fill="white" filter="drop-shadow(0px 2.72px 1px rgba(196, 196, 196, 1))"/>
-                  </svg>
-                </div>
-              </div>
+              <img src="/logo.png" alt="Super Content" className="h-16 w-16" />
               <span style={{ fontFamily: 'Bangers, sans-serif' }} className="text-2xl italic text-[#212121]">SUPER CONTENT</span>
             </div>
           </header>
@@ -225,14 +204,7 @@ export default function TikTokResultsPage() {
         <div className="min-h-screen bg-[#f9f9f9] text-[#595959]">
           <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-6">
             <div className="flex items-center gap-3">
-              <div className="relative">
-                <div className="absolute -inset-3 rounded-full bg-[#32e979]/30 blur-xl" />
-                <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#32e979] to-[#22e58b] shadow-lg">
-                  <svg width="22" height="23" viewBox="0 0 21.646 22.637" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M 18.877 9.871 C 20.046 10.482 20.046 12.155 18.877 12.766 L 2.391 21.387 C 1.303 21.955 0 21.166 0 19.939 L 0 2.698 C 0 1.47 1.303 0.681 2.391 1.25 Z" fill="white" filter="drop-shadow(0px 2.72px 1px rgba(196, 196, 196, 1))"/>
-                  </svg>
-                </div>
-              </div>
+              <img src="/logo.png" alt="Super Content" className="h-16 w-16" />
               <span style={{ fontFamily: 'Bangers, sans-serif' }} className="text-2xl italic text-[#212121]">SUPER CONTENT</span>
             </div>
             <nav className="hidden items-center gap-8 text-sm font-medium text-[#595959] md:flex">
