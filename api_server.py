@@ -169,7 +169,7 @@ async def generate_branded_video(request: GenerateVideoRequest):
             (
                 f"[0:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,format=yuv420p[vid];"
                 f"[vid]drawbox=y=ih-300:color=black@0.6:width=iw:height=300:t=fill[vid_grad];"
-                f"[vid_grad]drawtext=text='{caption_escaped}':fontfile=/System/Library/Fonts/Helvetica.ttc:fontsize=48:fontcolor=white:x=(w-text_w)/2:y=h-250:line_h=60:text_w=w-80:borderw=2:bordercolor=black[vid_text];"
+                f"[vid_grad]drawtext=text='{caption_escaped}':fontfile=/System/Library/Fonts/Helvetica.ttc:fontsize=48:fontcolor=white:x=40:y=h-250:w=w-80:borderw=2:bordercolor=black[vid_text];"
                 f"[1:v]scale=200:-1[logo];"
                 f"[vid_text][logo]overlay=x=(W-w)/2:y=H-280[final]"
             ),
