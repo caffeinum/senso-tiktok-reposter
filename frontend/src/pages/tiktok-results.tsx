@@ -12,6 +12,7 @@ export default function TikTokResultsPage() {
   const [showProcessing, setShowProcessing] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [brandCopy, setBrandCopy] = useState("When you're trying to build something big without Apify");
+  const [isGeneratingCopy, setIsGeneratingCopy] = useState(false);
 
   const videos = [
     { url: "https://litter.catbox.moe/lf5lvwzhis0hd8py.mp4", views: "75M" },
@@ -26,6 +27,29 @@ export default function TikTokResultsPage() {
   const handleContinueToUpload = () => {
     if (selectedVideo) {
       setShowUploadStep(true);
+    }
+  };
+
+  const handleGenerateCopy = async () => {
+    setIsGeneratingCopy(true);
+    try {
+      const response = await fetch("/api/airia", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: "demo-user",
+          userInput: `Generate a short, catchy TikTok video caption for a brand. Make it engaging and fun.`,
+          asyncOutput: false,
+        }),
+      });
+      const result = await response.json();
+      if (result.success && result.data) {
+        setBrandCopy(typeof result.data === "string" ? result.data : JSON.stringify(result.data));
+      }
+    } catch (error) {
+      console.error("Failed to generate copy:", error);
+    } finally {
+      setIsGeneratingCopy(false);
     }
   };
 
@@ -136,7 +160,16 @@ export default function TikTokResultsPage() {
               </div>
 
               <div className="space-y-3">
-                <label className="text-sm font-semibold text-[#212121]">video copy</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-semibold text-[#212121]">video copy</label>
+                  <button
+                    onClick={handleGenerateCopy}
+                    disabled={isGeneratingCopy}
+                    className="rounded-full border border-[#32e979] bg-white px-4 py-1.5 text-xs font-semibold text-[#32e979] transition hover:bg-[#32e979] hover:text-white disabled:opacity-50"
+                  >
+                    {isGeneratingCopy ? "generating..." : "generate with airia"}
+                  </button>
+                </div>
                 <textarea
                   value={brandCopy}
                   onChange={(e) => setBrandCopy(e.target.value)}
