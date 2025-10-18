@@ -1,0 +1,9 @@
+frontend/
+tiktok-search/
+tiktok-repurpose/
+*.md
+.git/
+.env
+__pycache__/
+*.pyc
+.venv/
