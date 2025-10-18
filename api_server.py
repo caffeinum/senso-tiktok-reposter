@@ -150,8 +150,9 @@ async def generate_branded_video(request: GenerateVideoRequest):
             f.write(logo_resp.content)
         
         if request.logo_url.endswith(".svg"):
+            magick_path = os.getenv("MAGICK_PATH", "magick")
             convert_result = subprocess.run(
-                ["magick", logo_raw_path, "-background", "none", logo_path],
+                [magick_path, logo_raw_path, "-background", "none", logo_path],
                 capture_output=True,
                 text=True,
                 timeout=10
@@ -169,8 +170,11 @@ async def generate_branded_video(request: GenerateVideoRequest):
         
         escaped_lines = [line.replace("'", "'\\''").replace(":", "\\:") for line in lines]
         
+        ffmpeg_path = os.getenv("FFMPEG_PATH", "ffmpeg")
+        magick_path = os.getenv("MAGICK_PATH", "magick")
+        
         ffmpeg_cmd = [
-            "ffmpeg", "-y", "-i", video_path, "-i", logo_path,
+            ffmpeg_path, "-y", "-i", video_path, "-i", logo_path,
             "-filter_complex",
             (
                 f"[0:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,format=yuv420p[vid];"
