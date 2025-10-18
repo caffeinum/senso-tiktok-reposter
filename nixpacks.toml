@@ -1,9 +1,8 @@
 [phases.setup]
-nixPkgs = ["...", "python311", "ffmpeg"]
-aptPkgs = ["...", "imagemagick"]
+aptPkgs = ["ffmpeg", "imagemagick"]
 
 [phases.install]
 cmds = ["pip install -r requirements.txt"]
 
 [start]
-cmd = "uvicorn api_server:app --host 0.0.0.0 --port $PORT"
+cmd = "export FFMPEG_PATH=/usr/bin/ffmpeg && export MAGICK_PATH=/usr/bin/convert && uvicorn api_server:app --host 0.0.0.0 --port $PORT"
