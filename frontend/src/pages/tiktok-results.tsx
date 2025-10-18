@@ -26,7 +26,8 @@ export default function TikTokResultsPage() {
     
     setIsLoadingVideos(true);
     try {
-      const response = await fetch("http://localhost:8000/api/tiktok/search", {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://senso-tiktok-reposter-production.up.railway.app";
+      const response = await fetch(`${apiUrl}/api/tiktok/search`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
