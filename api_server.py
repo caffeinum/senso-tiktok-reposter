@@ -134,6 +134,7 @@ async def search_tiktok(request: TikTokSearchRequest):
 async def generate_branded_video(request: GenerateVideoRequest):
     tmpdir = tempfile.mkdtemp()
     video_path = os.path.join(tmpdir, "input.mp4")
+    logo_raw_path = os.path.join(tmpdir, "logo_raw")
     logo_path = os.path.join(tmpdir, "logo.png")
     output_path = os.path.join(tmpdir, "output.mp4")
     
@@ -145,8 +146,20 @@ async def generate_branded_video(request: GenerateVideoRequest):
         
         logo_resp = requests.get(request.logo_url, timeout=30)
         logo_resp.raise_for_status()
-        with open(logo_path, "wb") as f:
+        with open(logo_raw_path, "wb") as f:
             f.write(logo_resp.content)
+        
+        if request.logo_url.endswith(".svg"):
+            convert_result = subprocess.run(
+                ["magick", logo_raw_path, "-background", "none", logo_path],
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            if convert_result.returncode != 0:
+                raise HTTPException(status_code=500, detail=f"Logo conversion failed: {convert_result.stderr}")
+        else:
+            os.rename(logo_raw_path, logo_path)
         
         caption_escaped = request.caption.replace("'", "'\\''").replace(":", "\\:")
         
