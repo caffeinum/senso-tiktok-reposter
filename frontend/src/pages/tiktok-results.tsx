@@ -13,6 +13,7 @@ export default function TikTokResultsPage() {
   const [showResult, setShowResult] = useState(false);
   const [brandCopy, setBrandCopy] = useState("When you're trying to build something big without Apify");
   const [isGeneratingCopy, setIsGeneratingCopy] = useState(false);
+  const [generatedVideoUrl, setGeneratedVideoUrl] = useState<string | null>(null);
 
   const [videos, setVideos] = useState<Array<{url: string; views: string; id?: string; downloadUrl?: string}>>([
     { url: "https://litter.catbox.moe/lf5lvwzhis0hd8py.mp4", views: "75M" },
@@ -107,20 +108,37 @@ export default function TikTokResultsPage() {
     }
   };
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     setShowUploadStep(false);
     setShowProcessing(true);
-  };
-
-  useEffect(() => {
-    if (showProcessing) {
-      const timer = setTimeout(() => {
+    
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://senso-tiktok-reposter-production.up.railway.app";
+      const response = await fetch(`${apiUrl}/api/video/generate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          video_url: selectedVideo,
+          logo_url: "https://supercontent.vercel.app/logo.png",
+          caption: brandCopy,
+        }),
+      });
+      
+      if (response.ok) {
+        const blob = await response.blob();
+        const videoUrl = URL.createObjectURL(blob);
+        setGeneratedVideoUrl(videoUrl);
         setShowProcessing(false);
         setShowResult(true);
-      }, 3000);
-      return () => clearTimeout(timer);
+      } else {
+        console.error("Failed to generate video");
+        setShowProcessing(false);
+      }
+    } catch (error) {
+      console.error("Video generation error:", error);
+      setShowProcessing(false);
     }
-  }, [showProcessing]);
+  };
 
   if (showResult) {
     return (
@@ -140,7 +158,7 @@ export default function TikTokResultsPage() {
           <main className="mx-auto flex w-full max-w-6xl gap-12 px-6 pb-24 pt-12">
             <div className="flex w-1/2 items-center justify-center">
               <video
-                src="/output.mp4"
+                src={generatedVideoUrl || "/output.mp4"}
                 controls
                 autoPlay
                 loop
@@ -160,13 +178,18 @@ export default function TikTokResultsPage() {
               </div>
 
               <div className="flex gap-4">
-                <button className="rounded-full bg-[#32e979] px-8 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-[#22e58b]">
+                <a
+                  href={generatedVideoUrl || "/output.mp4"}
+                  download="branded-video.mp4"
+                  className="rounded-full bg-[#32e979] px-8 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-[#22e58b]"
+                >
                   download video
-                </button>
+                </a>
                 <button
                   onClick={() => {
                     setShowResult(false);
                     setSelectedVideo(null);
+                    setGeneratedVideoUrl(null);
                   }}
                   className="rounded-full border border-[#d0d0d0] bg-white px-8 py-3 text-sm font-semibold text-[#595959] transition hover:bg-[#f5f5f5]"
                 >
