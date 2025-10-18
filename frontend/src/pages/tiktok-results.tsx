@@ -14,11 +14,49 @@ export default function TikTokResultsPage() {
   const [brandCopy, setBrandCopy] = useState("When you're trying to build something big without Apify");
   const [isGeneratingCopy, setIsGeneratingCopy] = useState(false);
 
-  const videos = [
+  const [videos, setVideos] = useState<Array<{url: string; views: string; id?: string; downloadUrl?: string}>>([
     { url: "https://litter.catbox.moe/lf5lvwzhis0hd8py.mp4", views: "75M" },
     { url: "https://api.apify.com/v2/key-value-stores/fPv7REDpL3IxnkKLr/records/video-happyhome_-20220505183502-7094322616432954670.mp4", views: "34M" },
     { url: "https://api.apify.com/v2/key-value-stores/kTZXe4EZAUAwPUq0z/records/video-quangminh_-20251014230959-7561218578016472351.mp4", views: "50M" },
-  ];
+  ]);
+  const [isLoadingVideos, setIsLoadingVideos] = useState(false);
+
+  const fetchTikTokVideos = async () => {
+    if (!keyword) return;
+    
+    setIsLoadingVideos(true);
+    try {
+      const response = await fetch("http://localhost:8000/api/tiktok/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          search_queries: [keyword],
+          results_per: 3,
+        }),
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        const formattedVideos = data.videos.map((v: any) => ({
+          url: v.downloadUrl || v.url,
+          views: v.views ? `${(v.views / 1000000).toFixed(0)}M` : "N/A",
+          id: v.id,
+          downloadUrl: v.downloadUrl,
+        }));
+        setVideos(formattedVideos);
+      }
+    } catch (error) {
+      console.error("Failed to fetch TikTok videos:", error);
+    } finally {
+      setIsLoadingVideos(false);
+    }
+  };
+
+  useEffect(() => {
+    if (keyword && !showUploadStep && !showProcessing && !showResult) {
+      fetchTikTokVideos();
+    }
+  }, [keyword]);
 
   const handleVideoSelect = (videoUrl: string) => {
     setSelectedVideo(videoUrl);
@@ -302,7 +340,12 @@ export default function TikTokResultsPage() {
           </div>
 
           <div className="flex w-3/4 flex-wrap justify-center gap-4">
-            {videos.map((video, idx) => (
+            {isLoadingVideos ? (
+              <div className="flex h-[500px] w-full items-center justify-center">
+                <div className="h-16 w-16 animate-spin rounded-full border-4 border-[#d0d0d0] border-t-[#32e979]" />
+              </div>
+            ) : (
+              videos.map((video, idx) => (
               <div
                 key={idx}
                 className="cursor-pointer space-y-2"
@@ -329,7 +372,8 @@ export default function TikTokResultsPage() {
                 </div>
                 <p className="text-center text-sm text-[#595959]">{video.views} views</p>
               </div>
-            ))}
+            ))
+            )}
           </div>
         </main>
       </div>
