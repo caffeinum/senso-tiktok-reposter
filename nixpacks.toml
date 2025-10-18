@@ -1,6 +1,6 @@
 [phases.setup]
-nixPkgs = ["python311"]
-aptPkgs = ["ffmpeg", "imagemagick"]
+nixPkgs = ["...", "python311", "ffmpeg"]
+aptPkgs = ["...", "imagemagick"]
 
 [phases.install]
 cmds = ["pip install -r requirements.txt"]
