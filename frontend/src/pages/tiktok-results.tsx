@@ -14,6 +14,8 @@ export default function TikTokResultsPage() {
   const [brandCopy, setBrandCopy] = useState("When you're trying to build something big without Apify");
   const [isGeneratingCopy, setIsGeneratingCopy] = useState(false);
   const [generatedVideoUrl, setGeneratedVideoUrl] = useState<string | null>(null);
+  const [generationStartTime, setGenerationStartTime] = useState<number | null>(null);
+  const [generationElapsed, setGenerationElapsed] = useState(0);
 
   const [videos, setVideos] = useState<Array<{url: string; views: string; id?: string; downloadUrl?: string}>>([
     { url: "https://litter.catbox.moe/lf5lvwzhis0hd8py.mp4", views: "75M" },
@@ -111,7 +113,9 @@ export default function TikTokResultsPage() {
   const handleGenerate = async () => {
     setShowUploadStep(false);
     setShowProcessing(true);
-    
+    setGenerationStartTime(Date.now());
+    setGenerationElapsed(0);
+
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://senso-tiktok-reposter-production.up.railway.app";
       const response = await fetch(`${apiUrl}/api/video/generate`, {
@@ -123,22 +127,34 @@ export default function TikTokResultsPage() {
           caption: brandCopy,
         }),
       });
-      
+
       if (response.ok) {
         const blob = await response.blob();
         const videoUrl = URL.createObjectURL(blob);
         setGeneratedVideoUrl(videoUrl);
         setShowProcessing(false);
         setShowResult(true);
+        setGenerationStartTime(null);
       } else {
         console.error("Failed to generate video");
         setShowProcessing(false);
+        setGenerationStartTime(null);
       }
     } catch (error) {
-      console.error("Video generation error:", error);
+      console.error("Error generating video:", error);
       setShowProcessing(false);
+      setGenerationStartTime(null);
     }
   };
+
+  useEffect(() => {
+    if (generationStartTime && showProcessing) {
+      const interval = setInterval(() => {
+        setGenerationElapsed(Math.floor((Date.now() - generationStartTime) / 1000));
+      }, 100);
+      return () => clearInterval(interval);
+    }
+  }, [generationStartTime, showProcessing]);
 
   if (showResult) {
     return (
@@ -291,7 +307,7 @@ export default function TikTokResultsPage() {
                   generating your branded video...
                 </h1>
                 <p className="text-sm text-[#595959]">
-                  this will take a few seconds
+                  elapsed: {generationElapsed}s • usually takes ~30 seconds
                 </p>
               </div>
             </div>
