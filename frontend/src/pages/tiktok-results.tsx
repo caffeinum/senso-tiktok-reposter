@@ -16,6 +16,7 @@ export default function TikTokResultsPage() {
   const [generatedVideoUrl, setGeneratedVideoUrl] = useState<string | null>(null);
   const [generationStartTime, setGenerationStartTime] = useState<number | null>(null);
   const [generationElapsed, setGenerationElapsed] = useState(0);
+  const [generationError, setGenerationError] = useState<string | null>(null);
 
   const [videos, setVideos] = useState<Array<{url: string; views: string; id?: string; downloadUrl?: string}>>([
     { url: "https://litter.catbox.moe/lf5lvwzhis0hd8py.mp4", views: "75M" },
@@ -115,6 +116,7 @@ export default function TikTokResultsPage() {
     setShowProcessing(true);
     setGenerationStartTime(Date.now());
     setGenerationElapsed(0);
+    setGenerationError(null);
 
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://senso-tiktok-reposter-production.up.railway.app";
@@ -136,12 +138,17 @@ export default function TikTokResultsPage() {
         setShowResult(true);
         setGenerationStartTime(null);
       } else {
-        console.error("Failed to generate video");
+        const errorData = await response.json().catch(() => ({ detail: `HTTP ${response.status}: ${response.statusText}` }));
+        const errorMsg = errorData.detail || `Failed with status ${response.status}`;
+        console.error("Failed to generate video:", errorMsg);
+        setGenerationError(errorMsg);
         setShowProcessing(false);
         setGenerationStartTime(null);
       }
     } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
       console.error("Error generating video:", error);
+      setGenerationError(errorMsg);
       setShowProcessing(false);
       setGenerationStartTime(null);
     }
@@ -310,6 +317,22 @@ export default function TikTokResultsPage() {
                   elapsed: {generationElapsed}s • usually takes ~30 seconds
                 </p>
               </div>
+              {generationError && (
+                <div className="mx-auto max-w-lg rounded-2xl border border-red-300 bg-red-50 p-4">
+                  <p className="text-sm font-semibold text-red-800">generation failed</p>
+                  <p className="mt-1 text-xs text-red-600">{generationError}</p>
+                  <button
+                    onClick={() => {
+                      setShowProcessing(false);
+                      setShowUploadStep(true);
+                      setGenerationError(null);
+                    }}
+                    className="mt-3 rounded-full bg-red-600 px-4 py-2 text-xs font-semibold text-white hover:bg-red-700"
+                  >
+                    try again
+                  </button>
+                </div>
+              )}
             </div>
           </main>
         </div>
