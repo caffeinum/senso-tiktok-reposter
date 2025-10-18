@@ -14,7 +14,7 @@ export default function TikTokResultsPage() {
   const [brandCopy, setBrandCopy] = useState("When you're trying to build something big without Apify");
 
   const videos = [
-    { url: "https://litter.catbox.moe/lf5lvwzhis0hd8py.mp4", views: "12M" },
+    { url: "https://litter.catbox.moe/lf5lvwzhis0hd8py.mp4", views: "75M" },
     { url: "https://api.apify.com/v2/key-value-stores/fPv7REDpL3IxnkKLr/records/video-happyhome_-20220505183502-7094322616432954670.mp4", views: "34M" },
     { url: "https://api.apify.com/v2/key-value-stores/kTZXe4EZAUAwPUq0z/records/video-quangminh_-20251014230959-7561218578016472351.mp4", views: "50M" },
   ];
